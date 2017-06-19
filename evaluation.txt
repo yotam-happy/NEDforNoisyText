@@ -1,0 +1,1 @@
+19/06/2017 04:29:26: 434028 samples in 434028 docs. 0.971785230446% mentions tried, avg. candidates per mention:", 22.1133998132 ". micro p@1: 0.722925587152% macro p@1: 0.722925587152% mps p@1: 0.658766851122%
