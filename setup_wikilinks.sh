@@ -19,7 +19,10 @@ else
     echo "Download correct" ; 
 fi
 
-# ------- Extract wikilinks dataset from thrift to json files
+mkdir data/wikilinks/urls
+unzip split.zip -d data/wikilinks/urls
+
+# ------- Extract wikilinks dataset from thrift to json files and create dataset
 # Have to be done manually at the moment???
 # Then run the next line
 python src/prepare_data.py $1 $2 $3 $4
