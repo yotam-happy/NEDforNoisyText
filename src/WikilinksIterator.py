@@ -4,8 +4,6 @@ import pandas as pd # pandas
 import re
 import pickle
 import ujson as json
-import gzip
-import cProfile
 import nltk
 import unicodedata
 from nltk.corpus import stopwords

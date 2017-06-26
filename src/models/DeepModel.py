@@ -10,16 +10,6 @@ import numpy as np
 from Word2vecLoader import DUMMY_KEY
 from PointwisePredict import *
 
-PUNK_MARK_CONV = {'!': '@!@',
-                  '"': '@"@', "'": '@"@',
-                  '(': '@(@', '[': '@(@', '{': '@(@',
-                  ')': '@)@', ']': '@)@', '}': '@)@',
-                  ',': '@,@',
-                  '-': '@-@',
-                  '.': '@.@',
-                  ':': '@:@',
-                  ';': '@;@',
-                  '?': '@?@'}
 
 def sum_seq(x):
     return K.sum(x, axis=1, keepdims=False)
@@ -393,11 +383,6 @@ class DeepModel:
             categories_X = np.array(categories_X)
 
         return left_context_X, right_context_X, mention_X, candidate_X, categories_X
-
-    def getSpecialToken(self, token):
-        if len(token) == 1 and token in PUNK_MARK_CONV:
-            return PUNK_MARK_CONV[token]
-        return None
 
     def wordIteratorToIndices(self, it, output_len):
         o = []

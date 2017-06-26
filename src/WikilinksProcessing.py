@@ -1,7 +1,6 @@
 import json
 import os
 import random
-import hashlib
 from urlparse import urlparse
 from WikilinksIterator import *
 from WikilinksStatistics import *

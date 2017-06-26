@@ -1,7 +1,6 @@
 import json
 import os
 import random
-import hashlib
 from urlparse import urlparse
 from WikilinksIterator import *
 from WikilinksStatistics import *
@@ -73,10 +72,14 @@ class wlink_writer:
     def finalize(self):
             self._dump()
 
-def splitWikis(iter, dest_dir, json_per_file=400000, validation_frac=0.1, test_frac=0.1):
-    train_hash, validation_hash, test_hash = _get_split(iter,
-                                                        validation_frac=validation_frac,
-                                                        test_frac=test_frac)
+def splitWikis(iter, dest_dir, json_per_file=400000, validation_frac=0.1, test_frac=0.1, split=None):
+    if split is not None:
+        train_hash, validation_hash, test_hash = split
+    else:
+        train_hash, validation_hash, test_hash = _get_split(iter,
+                                                            validation_frac=validation_frac,
+                                                            test_frac=test_frac)
+
     print "got ", len(train_hash)+len(validation_hash)+len(test_hash), " unique urls"
     train_writer = wlink_writer(os.path.join(dest_dir, "train"))
     validation_writer = wlink_writer(os.path.join(dest_dir, "validation"))
@@ -153,7 +156,7 @@ def copyWithFilter(src_path, dest_path, word_filter):
     train_iter = WikilinksNewIterator(path=src_path)
     writer = wlink_writer(dest_path)
     for wlink in train_iter.jsons():
-        if utils.text.strip_wiki_title(wlink['word']) in word_filter:
+        if utils.text.normalize_unicode(wlink['word']) in word_filter:
             writer.save(wlink)
     writer.finalize()
 
@@ -181,6 +184,7 @@ if __name__ == "__main__":
 
     wikilinks_data_folder = 'data/wikilinks/'
 
+    wikilinks_urls_folder = os.path.join(wikilinks_data_folder, 'urls')
     wikilinks_unprocessed_folder = os.path.join(wikilinks_data_folder, 'unprocessed')
     wikilinks_with_id_folder = os.path.join(wikilinks_data_folder, 'with-ids')
     wikilinks_filtered_folder = os.path.join(wikilinks_data_folder, 'filtered')
@@ -207,11 +211,20 @@ if __name__ == "__main__":
     stats.calcStatistics()
     stats.saveToFile(os.path.join(wikilinks_data_folder, 'all-stats'))
     stats.printSomeStats()
-
     # filter sets
     print 'filter only interesting mentions...'
     stats = WikilinksStatistics(None, load_from_file_path=os.path.join(wikilinks_data_folder, 'all-stats'))
-    good = stats.getGoodMentionsToDisambiguate(p=0.9, t=10)
+    good = stats.getGoodMentionsToDisambiguate(p=0.1, t=10)
+    print len(good), 'interesting mentions'
+    entities = set()
+    cases = 0
+    for mention in good:
+        for entity, count in stats.mentionLinks[mention].iteritems():
+            entities.add(entity)
+            cases += count
+    print len(entities), 'unique entities'
+    print cases, 'cases'
+
     os.makedirs(wikilinks_filtered_folder)
     copyWithFilter(wikilinks_with_id_folder, wikilinks_filtered_folder, good)
 
@@ -225,9 +238,19 @@ if __name__ == "__main__":
 
     ## split into train/validation/test (split by urls. All mentions from same url go to same folder)
     print 'split into train/test/validation...'
+    eval_urls = set()
+    test_urls = set()
+    train_urls = set()
+    with open(os.path.join(wikilinks_urls_folder, 'wikilinksNED_eval_urls.txt'), 'r') as f:
+        eval_urls = {_urlHash(x) for x in f}
+    with open(os.path.join(wikilinks_urls_folder, 'wikilinksNED_test_urls.txt'), 'r') as f:
+        test_urls = {_urlHash(x) for x in f}
+    with open(os.path.join(wikilinks_urls_folder, 'wikilinksNED_train_urls.txt'), 'r') as f:
+        train_urls = {_urlHash(x) for x in f}
+
     it = WikilinksNewIterator(wikilinks_shuffled_folder)
     os.makedirs(wikilinks_wikiNED_folder)
-    splitWikis(it, wikilinks_wikiNED_folder)
+    splitWikis(it, wikilinks_wikiNED_folder, split=(train_urls, eval_urls, test_urls))
 
     ## calculate statistics for train
     print 'calculate train statistics'

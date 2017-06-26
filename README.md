@@ -5,15 +5,15 @@ This repository contains code for reproducing our experiments in our "Named Enti
 Some manual steps are required to setup the data for the experiments
 
 - Please setup a mysql schema with the page and redirect tables from a Wikipedia dump.
-- Please place the wikipedia pages-article xml files at data/enwiki/pages-articles.xml.
+- Please place the wikipedia pages-article xml file at data/enwiki/pages-articles.xml.
 - For processing wikilinks files from umass an installationg of scala is required.
-- the wikilinks scala code seems to have problems with java-8, please make sure you have java-7 installed and jre paths direct to it.
 
+python libraries required for the project: keras, tensorflow, numpy, nltk, json, unicodedata, unidecode, mysql.connector, urllib, matplotlib, zipfile, ujson, pandas, urlparse, sklearn.
 
 For running the CoNLL test
 
-- Setup a CoNLL folder with the aida-conll dataset inside (CoNLL_AIDA-YAGO2-dataset.tsv)
-The generate this dataset refer to https://www.mpi-inf.mpg.de/departments/databases-and-information-systems/research/yago-naga/aida/downloads/
+- Create a data/CoNLL folder and place the aida-conll dataset inside (CoNLL_AIDA-YAGO2-dataset.tsv)
+To generate this dataset refer to https://www.mpi-inf.mpg.de/departments/databases-and-information-systems/research/yago-naga/aida/downloads/
 
 
 Seting up the data
@@ -21,6 +21,7 @@ run ./setup_data.sh
 to setup data for the wikilinksNED evaluation run ./setup_wikilinks.sh <db_user> <db_pass> <db_schema> <db_ip>
 to setup data for the conll evaluation run ./setup_conll.sh <db_user> <db_pass> <db_schema> <db_ip>
 
+REMARK: as of now you are required to use the script at https://github.com/NoamGit/Wiki2JSON/ to extract Wikilinks from its original format (thrift) to an easier to work with json format. The resulting files should be stored at data/wikilinks/unprocessed. We are working to automate this process as soon as possible.
 
 Running evaluations
 for running WikilinksNED evaluation run ./evaluateWikilinksNED.sh <db_user> <db_pass> <db_schema> <db_ip>

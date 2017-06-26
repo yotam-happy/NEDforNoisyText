@@ -94,7 +94,7 @@ if __name__ == "__main__":
                     tokens.append(token + ' ' + str(doc_id) + '\n')
                     if len(tokens) > 100 * 1000 * 1000:
                         # partially shuffle the dataset - shuffle every 100M tokens (much smaller then entire dataset...)
-                        random.shuffle(tokens)
+                        #random.shuffle(tokens)
                         f.writelines(tokens)
                         tokens = []
             if len(tokens) > 0:
@@ -113,7 +113,6 @@ if __name__ == "__main__":
         db_host = sys.argv[7]
         wikiDB = WikipediaDbWrapper(user=db_user, password=db_pass, database=db_schema, host=db_host)
 
-        '''
         writer = wlink_writer(output_dir + '_tmp')
         for mention, target, left_context, right_context in wikipedia_crossref_iterator(input_dir):
             wlink = dict()
@@ -123,8 +122,6 @@ if __name__ == "__main__":
             wlink['right_context'] = right_context
             writer.save(wlink)
         writer.finalize()
-        '''
-
 
         it = WikilinksNewIterator(output_dir + '_tmp', resolveIds=True, db=wikiDB)
         writer = wlink_writer(output_dir)
